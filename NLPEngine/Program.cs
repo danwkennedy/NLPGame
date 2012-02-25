@@ -29,6 +29,46 @@ namespace NLPEngine
             {
                 Console.WriteLine(syn);
             }
+            Console.WriteLine();
+
+            Console.WriteLine("Matching user verb 'grab' to game verbs 'catch, talk'");
+            List<String> gameVerbs = new List<String>();
+            gameVerbs.Add("catch");
+            gameVerbs.Add("talk");
+            Console.WriteLine("Matched verb: " + MatchUserVerbToGameVerb("grab", gameVerbs));
+            Console.WriteLine();
+
+            Console.WriteLine("Matching user noun 'cart' to game nouns 'wagon, sheep'");
+            List<String> gameNouns = new List<String>();
+            gameNouns.Add("wagon");
+            gameNouns.Add("sheep");
+            Console.WriteLine("Matched noun: " + MatchUserNounToGameNoun("cart", gameNouns));
+        }
+
+        static String MatchUserVerbToGameVerb(String verb, List<String> gameVerbs)
+        {
+            List<String> syns = GetVerbSynonyms(verb);
+            foreach (String syn in syns)
+            {
+                if (gameVerbs.Contains(syn))
+                {
+                    return syn;
+                }
+            }
+            return null;
+        }
+
+        static String MatchUserNounToGameNoun(String noun, List<String> gameNouns)
+        {
+            List<String> syns = GetNounSynonyms(noun);
+            foreach (String syn in syns)
+            {
+                if (gameNouns.Contains(syn))
+                {
+                    return syn;
+                }
+            }
+            return null;
         }
 
         static List<String> GetVerbSynonyms(String verb)
