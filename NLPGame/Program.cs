@@ -14,6 +14,16 @@ namespace NLPGame
         static bool isSunLeverPulled = false;
         static bool isWheelTurned = false;
 
+        //State variables for Room #2
+        static bool isNearKeys = false;
+        static bool hasHawkKey = false;
+        static bool hasLionKey = false;
+        static bool hasSharkKey = false;
+        static bool isHawkKeySuccess = false;
+        static bool isSharkKeySuccess = false;
+        static bool isNearDoorTwo = false;
+
+
         //Global state variables
         static int gamePosition = 0;
         static bool gameOver = false;
@@ -45,6 +55,13 @@ namespace NLPGame
             isNearWheel = false;
             isSunLeverPulled = false;
             isWheelTurned = false;
+            isNearKeys = false;
+            hasHawkKey = false;
+            hasLionKey = false;
+            hasSharkKey = false;
+            isHawkKeySuccess = false;
+            isSharkKeySuccess = false;
+            isNearDoorTwo = false;
             gamePosition = 0;
             gameOver = false;
         }
@@ -54,8 +71,10 @@ namespace NLPGame
             validActionsByGamePosition = new List<NounVerbPair>[5];
             validActionsByGamePosition[0] = new List<NounVerbPair>();
             validActionsByGamePosition[0].Add(new NounVerbPair("pedestal", "go", GoToPedestal));
+            
             validActionsByGamePosition[1] = new List<NounVerbPair>();
             validActionsByGamePosition[1].Add(new NounVerbPair("tablet", "read", ReadTablet));
+            
             validActionsByGamePosition[2] = new List<NounVerbPair>();
             validActionsByGamePosition[2].Add(new NounVerbPair("wheel", "go", GoToWheel));
             validActionsByGamePosition[2].Add(new NounVerbPair("levers", "go", GoToLevers));
@@ -66,6 +85,18 @@ namespace NLPGame
             validActionsByGamePosition[2].Add(new NounVerbPair("lightning", "pull", PullLightning));
             validActionsByGamePosition[2].Add(new NounVerbPair("sun", "pull", PullSun));
             validActionsByGamePosition[2].Add(new NounVerbPair("door", "open", OpenDoor));
+            
+            validActionsByGamePosition[3] = new List<NounVerbPair>();
+            validActionsByGamePosition[3].Add(new NounVerbPair("take", "hawk", TakeHawkKey));
+            validActionsByGamePosition[3].Add(new NounVerbPair("take", "shark", TakeSharkKey));
+            validActionsByGamePosition[3].Add(new NounVerbPair("take", "lion", TakeLionKey));
+            validActionsByGamePosition[3].Add(new NounVerbPair("use", "hawk", UseHawkKey));
+            validActionsByGamePosition[3].Add(new NounVerbPair("use", "shark", UseSharkKey));
+            validActionsByGamePosition[3].Add(new NounVerbPair("use", "lion", UseLionKey));
+            validActionsByGamePosition[3].Add(new NounVerbPair("keys", "go", GoToKeys));
+            validActionsByGamePosition[3].Add(new NounVerbPair("table", "go", GoToKeys));
+            validActionsByGamePosition[3].Add(new NounVerbPair("door", "go", GoToDoorTwo));
+            validActionsByGamePosition[3].Add(new NounVerbPair("door", "open", OpenDoorTwo));
         }
 
         // Core game function
@@ -123,7 +154,7 @@ namespace NLPGame
                 isNearDoor = false;
                 isNearLevers = true;
             }
-            Console.WriteLine("There is a large symbol in the center of the wheel that looks like the sun.\n");
+            Console.WriteLine("There are three levers with symbols above them.  One looks like lightning, one like rain, and another looks like the sun.\n");
         }
 
         static void PullLever(String dummy)
@@ -246,8 +277,154 @@ namespace NLPGame
             else
             {
                 Console.WriteLine("The door pushes open easily and you walk through.\n");
-                
-                // NEXT ROOM if we implement another one, otherwise gameOver = true and we should tell them they reached the inner sanctum
+                Console.WriteLine("You find yourself in another room.  You see a table in the center of the room with several keys on it.\n");
+                Console.WriteLine("On the far side of the room is a closed door.\n");
+                gamePosition = 3;
+            }
+        }
+
+        static void GoToKeys(String dummy)
+        {
+            if (isNearKeys)
+            {
+                Console.WriteLine("You are already at the table with the keys.\n");
+            }
+            else
+            {
+                Console.WriteLine("You walk over to the table with the keys.\n");
+                isNearKeys = true;
+                isNearDoorTwo = false;
+            }
+            Console.WriteLine("There are three keys on the table.\n");
+            Console.WriteLine("Looking at them closer you can see one is engraved with the symbol of a hawk, one with a lion, and one with a shark.\n");
+        }
+
+        static void TakeHawkKey(String dummy)
+        {
+            if (!isNearKeys)
+            {
+                Console.WriteLine("You can't take the hawk key from over here.\n");
+            }
+            else
+            {
+                Console.WriteLine("You take the key with the hawk symbol and put it in your pocket.\n");
+                hasHawkKey = true;
+            }
+        }
+
+        static void TakeSharkKey(String dummy)
+        {
+            if (!isNearKeys)
+            {
+                Console.WriteLine("You can't take the shark key from over here.\n");
+            }
+            else
+            {
+                Console.WriteLine("You take the key with the shark symbol and put it in your pocket.\n");
+                hasSharkKey = true;
+            }
+        }
+
+        static void TakeLionKey(String dummy)
+        {
+            if (!isNearKeys)
+            {
+                Console.WriteLine("You can't take the lion key from over here.\n");
+            }
+            else
+            {
+                Console.WriteLine("You take the key with the lion symbol and put it in your pocket.\n");
+                hasLionKey = true;
+            }
+        }
+
+        static void UseHawkKey(String dummy)
+        {
+            if (!hasHawkKey)
+            {
+                Console.WriteLine("You can't use the hawk key, you don't have it.\n");
+            }
+            else if (!isNearDoorTwo)
+            {
+                Console.WriteLine("You can't use the hawk key from over here.\n");
+            }
+            else
+            {
+                Console.WriteLine("You take the key with the hawk symbol and put it in one of the door locks and turn it.\n");
+                Console.WriteLine("You hear a click as of a latch releasing.\n");
+                isHawkKeySuccess = true;
+            }
+        }
+
+        static void UseSharkKey(String dummy)
+        {
+            if (!hasSharkKey)
+            {
+                Console.WriteLine("You can't use the shark key, you don't have it.\n");
+            }
+            else if (!isNearDoorTwo)
+            {
+                Console.WriteLine("You can't use the shark key from over here.\n");
+            }
+            else
+            {
+                Console.WriteLine("You take the key with the Shark symbol and put it in one of the door locks and turn it.\n");
+                Console.WriteLine("You hear a click as of a latch releasing.\n");
+                isSharkKeySuccess = true;
+            }
+        }
+
+        static void UseLionKey(String dummy)
+        {
+            if (!hasLionKey)
+            {
+                Console.WriteLine("You can't use the lion key, you don't have it.\n");
+            }
+            else if (!isNearDoorTwo)
+            {
+                Console.WriteLine("You can't use the lion key from over here.\n");
+            }
+            else
+            {
+                Console.WriteLine("You take the key with the lion symbol and put it in one of the door locks and turn it.\n");
+                Console.WriteLine("At first nothing happens.  Then you hear an enormous RRRROAR.\n");
+                Console.WriteLine("You spin around only to be face to face with a gigantic lion!  CHOMP! He eats you.\n");
+                Console.WriteLine("Sorry, game over.\n");
+                gameOver = true;
+            }
+        }
+
+        static void GoToDoorTwo(String dummy)
+        {
+            if (isNearDoorTwo)
+            {
+                Console.WriteLine("You are already at the door.\n");
+            }
+            else
+            {
+                Console.WriteLine("You walk over to the door.\n");
+                isNearKeys = false;
+                isNearDoorTwo = true;
+            }
+            Console.WriteLine("There are two large locks.\n");
+            Console.WriteLine("There are two images on the door, one appears to be a mouse and the other a fish.\n");
+        }
+
+        static void OpenDoorTwo(String dummy)
+        {
+            if (!isNearDoorTwo)
+            {
+                Console.WriteLine("You can't open the door from over here.\n");
+            }
+            else if (!isHawkKeySuccess || !isSharkKeySuccess)
+            {
+                Console.WriteLine("You shove the door but it doesn’t budge.  Something seems to be holding it in place.\n");
+            }
+            else
+            {
+                Console.WriteLine("The door pushes open easily and you walk through.\n");
+                Console.WriteLine("You find yourself in magnificent room plated in gold.\n");
+                Console.WriteLine("Congratulations! You have reached the inner sanctum.\n");
                 gameOver = true;
             }
         }
