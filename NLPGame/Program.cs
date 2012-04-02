@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using NLPEngine;
 
 namespace NLPGame
 {
@@ -27,6 +28,8 @@ namespace NLPGame
         //Global state variables
         static int gamePosition = 0;
         static bool gameOver = false;
+
+        static LinkGrammarParser linkGrammar;
 
         // the list of valid noun/verb pairs for a given point in the game, i.e. at the very beginning you can only do one action, 
         // at the next step you can only do one action, but at the third point there are many valid actions
@@ -68,6 +71,8 @@ namespace NLPGame
 
         static void setupGame()
         {
+            linkGrammar = new LinkGrammarParser();
+
             validActionsByGamePosition = new List<NounVerbPair>[5];
             validActionsByGamePosition[0] = new List<NounVerbPair>();
             validActionsByGamePosition[0].Add(new NounVerbPair("pedestal", "go", GoToPedestal));
@@ -116,6 +121,25 @@ namespace NLPGame
             String userInput = Console.ReadLine();
 
             //Make calls into NLP engine here to get the noun and verb matching the user's input,  we should repeat prompting until the user provides a valid input
+
+            // The verb and the noun pulled from the user input
+            string verb = "Invalid";
+            string noun = "Invalid";
+
+            bool isValid = false;
+           
+            // Loop until the link grammar returns a valid verb/noun combination
+            while (!isValid) {
+                if (linkGrammar.GetVerbNounPair(userInput, out verb, out noun))
+                {
+                    isValid = true;
+                }
+                else
+                {
+                    Console.WriteLine("I don't quite follow you. Please try again.");
+                    userInput = Console.ReadLine();
+                }
+            }
 
             //TODO temporaryily expect an integer for testing purposes
             int option = Convert.ToInt32(userInput);

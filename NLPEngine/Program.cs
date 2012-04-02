@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +8,9 @@ using System.Diagnostics;
  * @author Jessica Forrester - jwforres@ncsu.edu
  * @author Daniel Kennedy - dwkenned@ncsu.edu
  */
-
 namespace NLPEngine
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
@@ -45,7 +44,7 @@ namespace NLPEngine
             Console.WriteLine("Matched noun: " + MatchUserNounToGameNoun("cart", gameNouns));
         }
 
-        static String MatchUserVerbToGameVerb(String verb, List<String> gameVerbs)
+        public static String MatchUserVerbToGameVerb(String verb, List<String> gameVerbs)
         {
             List<String> syns = GetVerbSynonyms(verb);
             foreach (String syn in syns)
@@ -58,7 +57,7 @@ namespace NLPEngine
             return null;
         }
 
-        static String MatchUserNounToGameNoun(String noun, List<String> gameNouns)
+        public static String MatchUserNounToGameNoun(String noun, List<String> gameNouns)
         {
             List<String> syns = GetNounSynonyms(noun);
             foreach (String syn in syns)
