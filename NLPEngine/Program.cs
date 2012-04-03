@@ -44,6 +44,39 @@ namespace NLPEngine
             Console.WriteLine("Matched noun: " + MatchUserNounToGameNoun("cart", gameNouns));
         }
 
+        public static NounVerbPair MatchUserToGameVerbNounPair(NounVerbPair users, List<NounVerbPair> game)
+        {
+            List<String> vsyns = GetVerbSynonyms(users.verb);
+            List<String> nsyns = GetNounSynonyms(users.noun);
+            foreach (NounVerbPair pair in game)
+            {
+                String pnoun = pair.noun.ToLower();
+                String pverb = pair.verb.ToLower();
+                foreach (String vsyn in vsyns)
+                {
+                    //TODO log this to a log file
+                    //Console.WriteLine(pverb + " " + vsyn);
+                    if (pverb.IndexOf(vsyn) >= 0 || vsyn.IndexOf(pverb) >= 0)
+                    {
+                        //TODO log this to a log file
+                        //Console.WriteLine("matched verb");
+                        foreach (String nsyn in nsyns)
+                        {
+                            //TODO log this to a log file
+                            //Console.WriteLine(pnoun + " " + nsyn);
+                            if (pnoun.IndexOf(nsyn) >= 0 || nsyn.IndexOf(pnoun) >= 0)
+                            {
+                                //TODO log this to a log file
+                                //Console.WriteLine("matched noun");
+                                return pair;
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
         public static String MatchUserVerbToGameVerb(String verb, List<String> gameVerbs)
         {
             List<String> syns = GetVerbSynonyms(verb);
@@ -101,11 +134,15 @@ namespace NLPEngine
                     char[] delimiter = delimStr.ToCharArray();
                     foreach (String syn in syns1.Split(delimiter))
                     {
-                        syns.Add(syn.Trim());
+                        String trimmedSyn = syn.Trim();
+                        if (trimmedSyn.Length > 0)
+                            syns.Add(trimmedSyn);
                     }
                     foreach (String syn in syns2.Split(delimiter))
                     {
-                        syns.Add(syn.Trim());
+                        String trimmedSyn = syn.Trim();
+                        if (trimmedSyn.Length > 0)
+                            syns.Add(trimmedSyn);
                     }
                     break;
                 }
@@ -128,6 +165,23 @@ namespace NLPEngine
                 proc.WaitForExit(500);
 
             return outstream;
+        }
+    }
+    public class NounVerbPair
+    {
+        public String noun;
+        public String verb;
+        public Action<String> action;
+        public NounVerbPair(String theNoun, String theVerb)
+        {
+            noun = theNoun;
+            verb = theVerb;
+        }
+        public NounVerbPair(String theNoun, String theVerb, Action<String> theAction)
+        {
+            noun = theNoun;
+            verb = theVerb;
+            action = theAction;
         }
     }
 }

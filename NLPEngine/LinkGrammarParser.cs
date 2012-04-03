@@ -24,7 +24,12 @@ namespace NLPEngine
             pipe = new NamedPipeServerStream("testPipe", PipeDirection.InOut);
 
             Process linkGrammarProcess = new Process();
-            linkGrammarProcess.StartInfo.FileName = "D:\\git\\NLPGame\\Resources\\LinkGrammar.exe";
+            String fileName = System.IO.Path.GetDirectoryName(
+      System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase) + "\\..\\..\\..\\Resources\\LinkGrammar.exe";
+            if (fileName.StartsWith("file:"))
+                linkGrammarProcess.StartInfo.FileName = fileName.Substring(6);
+            else
+                linkGrammarProcess.StartInfo.FileName = fileName;
             //linkGrammarProcess.StartInfo.FileName = @"C:\Users\Daniel\Desktop\link-grammar-4.7.4\msvc9\Debug\LinkGrammarDextor.exe";
             linkGrammarProcess.StartInfo.Arguments += "testPipe";
 

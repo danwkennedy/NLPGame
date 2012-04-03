@@ -92,12 +92,12 @@ namespace NLPGame
             validActionsByGamePosition[2].Add(new NounVerbPair("door", "open", OpenDoor));
             
             validActionsByGamePosition[3] = new List<NounVerbPair>();
-            validActionsByGamePosition[3].Add(new NounVerbPair("take", "hawk", TakeHawkKey));
-            validActionsByGamePosition[3].Add(new NounVerbPair("take", "shark", TakeSharkKey));
-            validActionsByGamePosition[3].Add(new NounVerbPair("take", "lion", TakeLionKey));
-            validActionsByGamePosition[3].Add(new NounVerbPair("use", "hawk", UseHawkKey));
-            validActionsByGamePosition[3].Add(new NounVerbPair("use", "shark", UseSharkKey));
-            validActionsByGamePosition[3].Add(new NounVerbPair("use", "lion", UseLionKey));
+            validActionsByGamePosition[3].Add(new NounVerbPair("hawk", "take", TakeHawkKey));
+            validActionsByGamePosition[3].Add(new NounVerbPair("shark", "take", TakeSharkKey));
+            validActionsByGamePosition[3].Add(new NounVerbPair("lion", "take", TakeLionKey));
+            validActionsByGamePosition[3].Add(new NounVerbPair("hawk", "use", UseHawkKey));
+            validActionsByGamePosition[3].Add(new NounVerbPair("shark", "use", UseSharkKey));
+            validActionsByGamePosition[3].Add(new NounVerbPair("lion", "use", UseLionKey));
             validActionsByGamePosition[3].Add(new NounVerbPair("keys", "go", GoToKeys));
             validActionsByGamePosition[3].Add(new NounVerbPair("table", "go", GoToKeys));
             validActionsByGamePosition[3].Add(new NounVerbPair("door", "go", GoToDoorTwo));
@@ -118,6 +118,7 @@ namespace NLPGame
         static bool promptUserAndExecuteAction(List<NounVerbPair> validPairs)
         {
             Console.WriteLine("What do you want to do?");
+            Console.Write("> ");
             String userInput = Console.ReadLine();
 
             //Make calls into NLP engine here to get the noun and verb matching the user's input,  we should repeat prompting until the user provides a valid input
@@ -132,19 +133,27 @@ namespace NLPGame
             while (!isValid) {
                 if (linkGrammar.GetVerbNounPair(userInput, out verb, out noun))
                 {
-                    isValid = true;
+                    NounVerbPair pair = NLPEngine.Program.MatchUserToGameVerbNounPair(new NounVerbPair(noun, verb), validPairs);
+                    if (pair != null)
+                    {
+                        Console.WriteLine("\n");
+                        pair.action("dummy");
+                        isValid = true;
+                        break;
+                    }
+                    //The noun/verb didn't match to any valid ones
+                    Console.WriteLine("I don't quite follow you. Please try again.");
+                    Console.Write("> ");
+                    userInput = Console.ReadLine();
                 }
                 else
                 {
                     Console.WriteLine("I don't quite follow you. Please try again.");
+                    Console.Write("> ");
                     userInput = Console.ReadLine();
                 }
             }
 
-            //TODO temporaryily expect an integer for testing purposes
-            int option = Convert.ToInt32(userInput);
-            Console.Clear();
-            validPairs[option].action("dummy");
             return !gameOver;
         }
 
@@ -451,19 +460,6 @@ namespace NLPGame
                 Console.WriteLine("Congratulations! You have reached the inner sanctum.\n");
                 gameOver = true;
             }
-        }
-    }
-
-    class NounVerbPair
-    {
-        public String noun;
-        public String verb;
-        public Action<String> action;
-        public NounVerbPair(String theNoun, String theVerb, Action<String> theAction)
-        {
-            noun = theNoun;
-            verb = theVerb;
-            action = theAction;
         }
     }
 }
