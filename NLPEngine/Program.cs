@@ -116,8 +116,11 @@ namespace NLPEngine
         static List<String> GetSynonyms(String word, bool isVerb)
         {
             List<String> syns = new List<String>();
-            //TODO we will need to handle WordNet being in a different location
-            System.IO.StreamReader outstream = RunHiddenProcess("C:\\Program Files (x86)\\WordNet\\2.1\\bin\\wn", word + (isVerb ? " -synsv" : " -synsn"));
+            String fileName = System.IO.Path.GetDirectoryName(
+            System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase) + @"\..\..\..\WordNet\2.1\bin\wn";
+            if (fileName.StartsWith("file:"))
+                fileName = fileName.Substring(6);
+            System.IO.StreamReader outstream = RunHiddenProcess(fileName, word + (isVerb ? " -synsv" : " -synsn"));
 
             while (!outstream.EndOfStream)
             {
