@@ -50,13 +50,13 @@ namespace NLPEngine
             List<String> nsyns = GetNounSynonyms(users.noun);
             foreach (NounVerbPair pair in game)
             {
-                String pnoun = pair.noun.ToLower();
-                String pverb = pair.verb.ToLower();
+                String pnoun = pair.noun;
+                String pverb = pair.verb;
                 foreach (String vsyn in vsyns)
                 {
                     //TODO log this to a log file
                     //Console.WriteLine(pverb + " " + vsyn);
-                    if (pverb.IndexOf(vsyn) >= 0 || vsyn.IndexOf(pverb) >= 0)
+                    if (pverb.IndexOf(vsyn, StringComparison.OrdinalIgnoreCase) >= 0 || vsyn.IndexOf(pverb, StringComparison.OrdinalIgnoreCase) >= 0)
                     {
                         //TODO log this to a log file
                         //Console.WriteLine("matched verb");
@@ -64,7 +64,7 @@ namespace NLPEngine
                         {
                             //TODO log this to a log file
                             //Console.WriteLine(pnoun + " " + nsyn);
-                            if (pnoun.IndexOf(nsyn) >= 0 || nsyn.IndexOf(pnoun) >= 0)
+                            if (pnoun.IndexOf(nsyn, StringComparison.OrdinalIgnoreCase) >= 0 || nsyn.IndexOf(pnoun, StringComparison.OrdinalIgnoreCase) >= 0)
                             {
                                 //TODO log this to a log file
                                 //Console.WriteLine("matched noun");

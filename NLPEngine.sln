@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLPGame", "NLPGame\NLPGame.
 		{8E1C2756-36EF-49C9-9CEE-7D1FA70B27D3} = {8E1C2756-36EF-49C9-9CEE-7D1FA70B27D3}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NLPGameWithoutEngine", "NLPGameWithoutEngine\NLPGameWithoutEngine.csproj", "{3D811528-D18C-4CF5-A36C-3F5056B7EFE8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -50,6 +52,16 @@ Global
 		{AC260F93-4EF1-46C4-A97F-6996A593ACF8}.Release|Win32.ActiveCfg = Release|x86
 		{AC260F93-4EF1-46C4-A97F-6996A593ACF8}.Release|x86.ActiveCfg = Release|x86
 		{AC260F93-4EF1-46C4-A97F-6996A593ACF8}.Release|x86.Build.0 = Release|x86
+		{3D811528-D18C-4CF5-A36C-3F5056B7EFE8}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{3D811528-D18C-4CF5-A36C-3F5056B7EFE8}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{3D811528-D18C-4CF5-A36C-3F5056B7EFE8}.Debug|Win32.ActiveCfg = Debug|x86
+		{3D811528-D18C-4CF5-A36C-3F5056B7EFE8}.Debug|x86.ActiveCfg = Debug|x86
+		{3D811528-D18C-4CF5-A36C-3F5056B7EFE8}.Debug|x86.Build.0 = Debug|x86
+		{3D811528-D18C-4CF5-A36C-3F5056B7EFE8}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{3D811528-D18C-4CF5-A36C-3F5056B7EFE8}.Release|Mixed Platforms.Build.0 = Release|x86
+		{3D811528-D18C-4CF5-A36C-3F5056B7EFE8}.Release|Win32.ActiveCfg = Release|x86
+		{3D811528-D18C-4CF5-A36C-3F5056B7EFE8}.Release|x86.ActiveCfg = Release|x86
+		{3D811528-D18C-4CF5-A36C-3F5056B7EFE8}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
