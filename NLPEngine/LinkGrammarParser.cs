@@ -19,24 +19,17 @@ namespace NLPEngine
         string regexPattern = @"\[VP (\w+)(?: \[PP \w+)* \[NP (?:the |a )*([\w+|\s]+)* NP\]";
 
 
-        public LinkGrammarParser()
+        StreamWriter fileWriter;
+
+        public LinkGrammarParser(int runNumber)
         {
             pipe = new NamedPipeServerStream("testPipe", PipeDirection.InOut);
 
             Process linkGrammarProcess = new Process();
-            String fileName = System.IO.Path.GetDirectoryName(
-            System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase) + @"\..\..\..\Resources\LinkGrammar.exe";
+            String fileName = Directory.GetCurrentDirectory() + @"\..\..\..\Resources\LinkGrammar.exe";
 
-            if (fileName.StartsWith("file:"))
-            {
-                linkGrammarProcess.StartInfo.FileName = fileName.Substring(6);
-            }
-            else
-            {
-                linkGrammarProcess.StartInfo.FileName = fileName;
-            }
+            linkGrammarProcess.StartInfo.FileName = fileName;
 
-            //linkGrammarProcess.StartInfo.FileName = @"C:\Users\Daniel\Desktop\link-grammar-4.7.4\msvc9\Debug\LinkGrammarDextor.exe";
             linkGrammarProcess.StartInfo.Arguments += "testPipe";
 
             linkGrammarProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -49,12 +42,44 @@ namespace NLPEngine
 
             writer = new StreamWriter(pipe);
             reader = new StreamReader(pipe);
+
+            SetupDataGathering(runNumber);
+        }
+
+        ~LinkGrammarParser()
+        {
+            fileWriter.WriteLine("Shutting Down");
+            fileWriter.Close();
+            pipe.Close();
+        }
+
+        private void SetupDataGathering(int run)
+        {
+            string baseDirectory = Directory.GetCurrentDirectory() + @"\..\..\..\Logs\" + run;
+            DirectoryInfo info = new DirectoryInfo(baseDirectory);
+
+            // Check to see if the directory exists, if not, create it
+            if (!info.Exists)
+            {
+                info.Create();
+            }
+
+            string filepath = baseDirectory + @"\Linkgrammar.txt";
+
+            fileWriter = File.CreateText(filepath);
+            fileWriter.AutoFlush = true;
+            fileWriter.WriteLine("NLP Game run #{0}", run);
+            fileWriter.WriteLine("Logging the Link Grammar Parser's output");
+            fileWriter.WriteLine("Logging started at: {0}, {1}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString());
+            fileWriter.WriteLine(" ");
         }
 
         public bool GetVerbNounPair(string sentence, out string verb, out string noun)
         {
             try
             {
+                fileWriter.WriteLine("Sending: {0}", sentence);
+
                 writer.WriteLine(sentence);
                 writer.Flush();
                 string response = "";
@@ -70,6 +95,8 @@ namespace NLPEngine
                     }
                 }
 
+                fileWriter.WriteLine("Recieved: {0}", response);
+                
                 return ParseTree(response, out verb, out noun);
             }
             catch (IOException e)
@@ -89,22 +116,26 @@ namespace NLPEngine
 
             MatchCollection matches = Regex.Matches(sentence, regexPattern);
 
-            //Console.WriteLine("Number of matches: {0}", matches.Count);
-
             if (matches.Count > 0)
             {
                 verb = matches[0].Groups[1].Value;
                 noun = matches[0].Groups[2].Value;
+
+                fileWriter.WriteLine("Parsed into: {0}(verb), {1}(noun)", verb, noun);
+                fileWriter.WriteLine(" ");
+
                 return true;
             }
             else
             {
                 verb = "Invalid";
                 noun = "Invalid";
+
+                fileWriter.WriteLine("Parsed into: {0}(verb), {1}(noun)", verb, noun);
+                fileWriter.WriteLine(" ");
+
                 return false;
             }
-
-            
         }
     }
 }

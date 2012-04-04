@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NLPEngine;
+using System.IO;
 
 namespace NLPGame
 {
@@ -29,7 +30,15 @@ namespace NLPGame
         static int gamePosition = 0;
         static bool gameOver = false;
 
+        static int runNumber;
+
         static LinkGrammarParser linkGrammar;
+
+        static StreamWriter fileWriter;
+
+        static int sentencesNotParsed = 0;
+        static int sentencesNotMatched = 0;
+        static int sentencesCorrect = 0;
 
         // the list of valid noun/verb pairs for a given point in the game, i.e. at the very beginning you can only do one action, 
         // at the next step you can only do one action, but at the third point there are many valid actions
@@ -38,6 +47,7 @@ namespace NLPGame
         // Main function, repeatedly lets the user play the game until they choose not to
         static void Main(string[] args)
         {
+            SetupDataGathering();
             setupGame();
             bool playAgain = true;
             while (playAgain)
@@ -45,10 +55,20 @@ namespace NLPGame
                 Console.Clear();
                 resetGameState();
                 playGame();
+
+                fileWriter.WriteLine("Game ended at {0}", DateTime.Now.ToShortTimeString());
+                fileWriter.WriteLine("Number of sentences not parsed: {0}", sentencesNotParsed);
+                fileWriter.WriteLine("Number of sentences not matched: {0}", sentencesNotMatched);
+                fileWriter.WriteLine("Total number of missed sentences: {0}", (sentencesNotParsed + sentencesNotMatched));
+                fileWriter.WriteLine("Total number of sentences passed: {0}", sentencesCorrect);
+                fileWriter.WriteLine("Ratio of sentences passed over sentences not passed: {0}",  (float)sentencesCorrect / ((float) sentencesNotParsed + (float) sentencesNotMatched));
+
                 Console.WriteLine("\nWould you like to play again? (Yes or No)\n");
                 String yesOrNo = Console.ReadLine();
                 playAgain = yesOrNo.Equals("Yes") || yesOrNo.Equals("yes") || yesOrNo.Equals("Y") || yesOrNo.Equals("y");
             }
+
+            fileWriter.Close();
         }
 
         static void resetGameState()
@@ -69,9 +89,48 @@ namespace NLPGame
             gameOver = false;
         }
 
+        static void SetupDataGathering()
+        {
+            string baseDirectory = Directory.GetCurrentDirectory() + @"\..\..\..\Logs";
+            DirectoryInfo info = new DirectoryInfo(baseDirectory);
+
+            if (info.Exists)
+            {
+                FileSystemInfo[] files = info.GetFileSystemInfos();
+
+                runNumber = 0;
+                foreach (FileSystemInfo file in files)
+                {
+                    int index;
+                    if (Int32.TryParse(file.Name, out index))
+                    {
+                        if (index >= runNumber)
+                        {
+                            runNumber = index + 1;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                info.Create();
+                runNumber = 0;
+            }
+
+
+            DirectoryInfo parentInfo = Directory.CreateDirectory(baseDirectory + @"\" + runNumber);
+            string filename = parentInfo.FullName + @"\GameLog.txt";
+            
+            fileWriter = File.CreateText(filename);
+            fileWriter.AutoFlush = true;
+            fileWriter.WriteLine("NLP Game run #{0}", runNumber);
+            fileWriter.WriteLine("Logging game activity");
+            fileWriter.WriteLine("Game started at: {0}, {1}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString());
+        }
+
         static void setupGame()
         {
-            linkGrammar = new LinkGrammarParser();
+            linkGrammar = new LinkGrammarParser(runNumber);
 
             validActionsByGamePosition = new List<NounVerbPair>[5];
             validActionsByGamePosition[0] = new List<NounVerbPair>();
@@ -139,8 +198,13 @@ namespace NLPGame
                         Console.WriteLine("\n");
                         pair.action("dummy");
                         isValid = true;
+
+                        sentencesCorrect++;
                         break;
                     }
+
+                    sentencesNotMatched++;
+
                     //The noun/verb didn't match to any valid ones
                     Console.WriteLine("I don't quite follow you. Please try again.");
                     Console.Write("> ");
@@ -148,6 +212,8 @@ namespace NLPGame
                 }
                 else
                 {
+                    sentencesNotParsed++;
+
                     Console.WriteLine("I don't quite follow you. Please try again.");
                     Console.Write("> ");
                     userInput = Console.ReadLine();
