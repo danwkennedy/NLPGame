@@ -80,7 +80,6 @@ namespace NLPGameWithoutEngine
             validActionsByGamePosition[2].Add(new NounVerbPair("levers", "go", GoToLevers));
             validActionsByGamePosition[2].Add(new NounVerbPair("door", "go", GoToDoor));
             validActionsByGamePosition[2].Add(new NounVerbPair("wheel", "turn", TurnWheel));
-            validActionsByGamePosition[2].Add(new NounVerbPair("lever", "pull", PullLever));
             validActionsByGamePosition[2].Add(new NounVerbPair("rain", "pull", PullRain));
             validActionsByGamePosition[2].Add(new NounVerbPair("lightning", "pull", PullLightning));
             validActionsByGamePosition[2].Add(new NounVerbPair("sun", "pull", PullSun));

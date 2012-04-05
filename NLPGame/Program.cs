@@ -69,6 +69,8 @@ namespace NLPGame
             }
 
             fileWriter.Close();
+            NLPEngine.Program.EndDataGathering();
+            linkGrammar.EndDataGathering();
         }
 
         static void resetGameState()
@@ -126,6 +128,8 @@ namespace NLPGame
             fileWriter.WriteLine("NLP Game run #{0}", runNumber);
             fileWriter.WriteLine("Logging game activity");
             fileWriter.WriteLine("Game started at: {0}, {1}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString());
+
+            NLPEngine.Program.SetupDataGathering(runNumber);
         }
 
         static void setupGame()
@@ -144,7 +148,6 @@ namespace NLPGame
             validActionsByGamePosition[2].Add(new NounVerbPair("levers", "go", GoToLevers));
             validActionsByGamePosition[2].Add(new NounVerbPair("door", "go", GoToDoor));
             validActionsByGamePosition[2].Add(new NounVerbPair("wheel", "turn", TurnWheel));
-            validActionsByGamePosition[2].Add(new NounVerbPair("lever", "pull", PullLever));
             validActionsByGamePosition[2].Add(new NounVerbPair("rain", "pull", PullRain));
             validActionsByGamePosition[2].Add(new NounVerbPair("lightning", "pull", PullLightning));
             validActionsByGamePosition[2].Add(new NounVerbPair("sun", "pull", PullSun));
@@ -204,6 +207,7 @@ namespace NLPGame
                     }
 
                     sentencesNotMatched++;
+                    NLPEngine.Program.wnFileWriter.WriteLine("failure was at game position " + gamePosition);
 
                     //The noun/verb didn't match to any valid ones
                     Console.WriteLine("I don't quite follow you. Please try again.");

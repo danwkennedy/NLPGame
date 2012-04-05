@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using System.IO;
 
 /*
  * @author Jessica Forrester - jwforres@ncsu.edu
@@ -12,6 +13,7 @@ namespace NLPEngine
 {
     public class Program
     {
+        static public StreamWriter wnFileWriter;
         static void Main(string[] args)
         {
             //Sample code testing the get synonym functions
@@ -46,33 +48,49 @@ namespace NLPEngine
 
         public static NounVerbPair MatchUserToGameVerbNounPair(NounVerbPair users, List<NounVerbPair> game)
         {
-            List<String> vsyns = GetVerbSynonyms(users.verb);
-            List<String> nsyns = GetNounSynonyms(users.noun);
+            
+            List<String> vsyns = new List<String>();
+            string delimStr = " \t";
+            char [] delimiter = delimStr.ToCharArray();
+            foreach(String userv in users.verb.Split(delimiter))
+            {
+                if (userv.Trim().Length > 0)
+                    vsyns.AddRange(GetVerbSynonyms(userv));
+            }
+            List<String> nsyns = new List<String>();
+            foreach (String usern in users.noun.Split(delimiter))
+            {
+                if (usern.Trim().Length > 0)
+                    nsyns.AddRange(GetNounSynonyms(usern));
+            }
             foreach (NounVerbPair pair in game)
             {
                 String pnoun = pair.noun;
                 String pverb = pair.verb;
                 foreach (String vsyn in vsyns)
                 {
-                    //TODO log this to a log file
-                    //Console.WriteLine(pverb + " " + vsyn);
                     if (pverb.IndexOf(vsyn, StringComparison.OrdinalIgnoreCase) >= 0 || vsyn.IndexOf(pverb, StringComparison.OrdinalIgnoreCase) >= 0)
                     {
-                        //TODO log this to a log file
-                        //Console.WriteLine("matched verb");
                         foreach (String nsyn in nsyns)
                         {
-                            //TODO log this to a log file
-                            //Console.WriteLine(pnoun + " " + nsyn);
                             if (pnoun.IndexOf(nsyn, StringComparison.OrdinalIgnoreCase) >= 0 || nsyn.IndexOf(pnoun, StringComparison.OrdinalIgnoreCase) >= 0)
                             {
-                                //TODO log this to a log file
-                                //Console.WriteLine("matched noun");
+                                if (wnFileWriter != null)
+                                    wnFileWriter.WriteLine("MATCHED user verb \""+users.verb+"\" to game verb \"" + pverb + "\" and user noun \""+users.noun + "\" to game noun \"" + pnoun + "\"");
                                 return pair;
                             }
                         }
                     }
                 }
+            }
+            if (wnFileWriter != null) {
+                wnFileWriter.Write("FAILED to match user verb \"" + users.verb + "\" or its synonyms " );
+                foreach (String vsyn in vsyns)
+                    wnFileWriter.Write(vsyn + ", ");
+                wnFileWriter.Write(" or user noun \"" + users.noun + "\" and its synonyms ");
+                foreach (String nsyn in nsyns)
+                    wnFileWriter.Write(nsyn + ", ");
+                wnFileWriter.WriteLine("");
             }
             return null;
         }
@@ -168,6 +186,32 @@ namespace NLPEngine
                 proc.WaitForExit(500);
 
             return outstream;
+        }
+
+        public static void SetupDataGathering(int run)
+        {
+            string baseDirectory = Directory.GetCurrentDirectory() + @"\..\..\..\Logs\" + run;
+            DirectoryInfo info = new DirectoryInfo(baseDirectory);
+
+            // Check to see if the directory exists, if not, create it
+            if (!info.Exists)
+            {
+                info.Create();
+            }
+
+            string filepath = baseDirectory + @"\Wordnet.txt";
+
+            wnFileWriter = File.CreateText(filepath);
+            wnFileWriter.AutoFlush = true;
+            wnFileWriter.WriteLine("NLP Game run #{0}", run);
+            wnFileWriter.WriteLine("Logging the WordNet output");
+            wnFileWriter.WriteLine("Logging started at: {0}, {1}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString());
+            wnFileWriter.WriteLine(" ");
+        }
+        public static void EndDataGathering()
+        {
+            wnFileWriter.WriteLine("Shutting Down");
+            wnFileWriter.Close();
         }
     }
     public class NounVerbPair

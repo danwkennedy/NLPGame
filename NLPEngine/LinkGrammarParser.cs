@@ -48,8 +48,6 @@ namespace NLPEngine
 
         ~LinkGrammarParser()
         {
-            fileWriter.WriteLine("Shutting Down");
-            fileWriter.Close();
             pipe.Close();
         }
 
@@ -72,6 +70,12 @@ namespace NLPEngine
             fileWriter.WriteLine("Logging the Link Grammar Parser's output");
             fileWriter.WriteLine("Logging started at: {0}, {1}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString());
             fileWriter.WriteLine(" ");
+        }
+
+        public void EndDataGathering()
+        {
+            fileWriter.WriteLine("Shutting Down");
+            fileWriter.Close();
         }
 
         public bool GetVerbNounPair(string sentence, out string verb, out string noun)
