@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace NLPGameWithoutEngine
 {
@@ -28,6 +29,15 @@ namespace NLPGameWithoutEngine
         static int gamePosition = 0;
         static bool gameOver = false;
 
+        static int runNumber;
+        //static TimeSpan playTime;
+        static DateTime startTime;
+
+        static StreamWriter fileWriter;
+
+        static int sentencesNotMatched = 0;
+        static int sentencesCorrect = 0;
+
         // the list of valid noun/verb pairs for a given point in the game, i.e. at the very beginning you can only do one action, 
         // at the next step you can only do one action, but at the third point there are many valid actions
         static List<NounVerbPair>[] validActionsByGamePosition;
@@ -35,6 +45,7 @@ namespace NLPGameWithoutEngine
         // Main function, repeatedly lets the user play the game until they choose not to
         static void Main(string[] args)
         {
+            SetupDataGathering();
             setupGame();
             bool playAgain = true;
             while (playAgain)
@@ -42,10 +53,18 @@ namespace NLPGameWithoutEngine
                 Console.Clear();
                 resetGameState();
                 playGame();
+
+                fileWriter.WriteLine("Game ended at {0}", DateTime.Now.ToShortTimeString());
+                fileWriter.WriteLine("Play time (seconds): {0}", DateTime.Now.Subtract(startTime).TotalSeconds);
+                fileWriter.WriteLine("Total number of sentences not matched: {0}", sentencesNotMatched);
+                fileWriter.WriteLine("Total number of sentences passed: {0}", sentencesCorrect);
+                fileWriter.WriteLine("Ratio of sentences passed over sentences not passed: {0}", (float)sentencesCorrect / (float)sentencesNotMatched);
+
                 Console.WriteLine("\nWould you like to play again? (Yes or No)\n");
                 String yesOrNo = Console.ReadLine();
                 playAgain = yesOrNo.Equals("Yes") || yesOrNo.Equals("yes") || yesOrNo.Equals("Y") || yesOrNo.Equals("y");
             }
+            fileWriter.Close();
         }
 
         static void resetGameState()
@@ -64,6 +83,44 @@ namespace NLPGameWithoutEngine
             isNearDoorTwo = false;
             gamePosition = 0;
             gameOver = false;
+        }
+
+        static void SetupDataGathering()
+        {
+            string baseDirectory = Directory.GetCurrentDirectory() + @"\..\..\..\Logs";
+            DirectoryInfo info = new DirectoryInfo(baseDirectory);
+
+            if (info.Exists)
+            {
+                FileSystemInfo[] files = info.GetFileSystemInfos();
+
+                runNumber = 0;
+                foreach (FileSystemInfo file in files)
+                {
+                    int index;
+                    if (Int32.TryParse(file.Name, out index))
+                    {
+                        if (index >= runNumber)
+                        {
+                            runNumber = index + 1;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                info.Create();
+                runNumber = 0;
+            }
+
+            DirectoryInfo parentInfo = Directory.CreateDirectory(baseDirectory + @"\" + runNumber);
+            string filename = parentInfo.FullName + @"\NoNLPGameLog.txt";
+
+            fileWriter = File.CreateText(filename);
+            fileWriter.AutoFlush = true;
+            fileWriter.WriteLine("NLP Game run #{0}", runNumber);
+            fileWriter.WriteLine("Logging game activity");
+            fileWriter.WriteLine("Game started at: {0}, {1}", DateTime.Now.ToShortDateString(), DateTime.Now.ToShortTimeString());
         }
 
         static void setupGame()
@@ -125,11 +182,14 @@ namespace NLPGameWithoutEngine
                         Console.WriteLine("\n");
                         pair.action("dummy");
                         isValid = true;
+                        sentencesCorrect++;
                         break;
                     }
                 }
                 if (!isValid)
                 {
+                    sentencesNotMatched++;
+                    fileWriter.WriteLine("FAILED to match user input \"" + userInput + "\" during game state " + gamePosition);
                     Console.WriteLine("I don't quite follow you. Please try again.");
                     Console.Write("> ");
                     userInput = Console.ReadLine();
