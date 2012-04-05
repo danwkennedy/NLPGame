@@ -31,6 +31,8 @@ namespace NLPGame
         static bool gameOver = false;
 
         static int runNumber;
+        //static TimeSpan playTime;
+        static DateTime startTime;
 
         static LinkGrammarParser linkGrammar;
 
@@ -57,6 +59,7 @@ namespace NLPGame
                 playGame();
 
                 fileWriter.WriteLine("Game ended at {0}", DateTime.Now.ToShortTimeString());
+                fileWriter.WriteLine("Play time (seconds): {0}", DateTime.Now.Subtract(startTime).TotalSeconds);
                 fileWriter.WriteLine("Number of sentences not parsed: {0}", sentencesNotParsed);
                 fileWriter.WriteLine("Number of sentences not matched: {0}", sentencesNotMatched);
                 fileWriter.WriteLine("Total number of missed sentences: {0}", (sentencesNotParsed + sentencesNotMatched));
@@ -119,7 +122,6 @@ namespace NLPGame
                 runNumber = 0;
             }
 
-
             DirectoryInfo parentInfo = Directory.CreateDirectory(baseDirectory + @"\" + runNumber);
             string filename = parentInfo.FullName + @"\GameLog.txt";
             
@@ -164,6 +166,8 @@ namespace NLPGame
             validActionsByGamePosition[3].Add(new NounVerbPair("table", "go", GoToKeys));
             validActionsByGamePosition[3].Add(new NounVerbPair("door", "go", GoToDoorTwo));
             validActionsByGamePosition[3].Add(new NounVerbPair("door", "open", OpenDoorTwo));
+
+            startTime = DateTime.Now;
         }
 
         // Core game function
