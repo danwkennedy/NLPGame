@@ -153,6 +153,8 @@ namespace NLPGameWithoutEngine
             validActionsByGamePosition[3].Add(new NounVerbPair("table", "go", GoToKeys));
             validActionsByGamePosition[3].Add(new NounVerbPair("door", "go", GoToDoorTwo));
             validActionsByGamePosition[3].Add(new NounVerbPair("door", "open", OpenDoorTwo));
+
+            startTime = DateTime.Now;
         }
 
         // Core game function
